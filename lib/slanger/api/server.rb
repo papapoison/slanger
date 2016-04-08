@@ -45,6 +45,21 @@ module Slanger
         return Oj.dump({}, mode: :compat)
       end
 
+      get '/apps/:app_id/channels' do
+        params = valid_request.params
+        keys = Slanger::Redis.keys params["filter_by_prefix"]
+
+        status 200
+        return Oj.dump({channels: keys})
+      end
+
+      get '/apps/:app_id/channels/:channel_id/users' do
+        users = Slanger::Redis.hgetall channel_id
+
+        status 200
+        return Oj.dump({users: users})
+      end
+
       def valid_request
         @valid_request ||=
           begin

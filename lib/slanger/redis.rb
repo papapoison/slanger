@@ -32,6 +32,10 @@ module Slanger
       end
     end
 
+    def keys prefix = nil
+      return EM::Hiredis.keys prefix+"*"
+    end
+
     def new_connection
       EM::Hiredis.connect Slanger::Config.redis_address
     end
