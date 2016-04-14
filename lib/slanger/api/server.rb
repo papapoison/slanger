@@ -47,7 +47,7 @@ module Slanger
       end
 
       get '/apps/:app_id/channels' do
-        key_name = valid_request.params['filter_by_prefix'].nil? ? "*" : valid_request.params['filter_by_prefix']+"*"
+        key_name = request.params['filter_by_prefix'].nil? ? "*" : request.params['filter_by_prefix']+"*"
         keys = Redis.new(url: Slanger::Config.redis_address).keys key_name
 
         status 200
