@@ -3,9 +3,10 @@
 
 require 'forwardable'
 require 'oj'
+require 'redis'
 
 module Slanger
-  module Redis
+  module EMRedis
     extend Forwardable
 
     def_delegator  :publisher, :publish
@@ -30,10 +31,6 @@ module Slanger
           c.dispatch message, channel
         end
       end
-    end
-
-    def keys prefix = nil
-      return EM::Hiredis.keys prefix+"*"
     end
 
     def new_connection

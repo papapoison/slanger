@@ -3,8 +3,8 @@ require 'slanger'
 require 'oj'
 
 def clear_redis_connections
-  Slanger::Redis.instance_variables.each do |ivar|
-    Slanger::Redis.send :remove_instance_variable, ivar
+  Slanger::EMRedis.instance_variables.each do |ivar|
+    Slanger::EMRedis.send :remove_instance_variable, ivar
   end
 end
 
@@ -23,7 +23,7 @@ describe 'Slanger::Channel' do
 
   describe '#unsubscribe' do
     it 'decrements channel subscribers on Redis' do
-      Slanger::Redis.expects(:hincrby).
+      Slanger::EMRedis.expects(:hincrby).
         with('channel_subscriber_count', channel.channel_id, -1).
         once.returns mock { expects(:callback).once.yields(2) }
 
@@ -35,7 +35,7 @@ describe 'Slanger::Channel' do
         with(name: 'channel_vacated', channel: channel.channel_id).
         once
 
-      Slanger::Redis.expects(:hincrby).
+      Slanger::EMRedis.expects(:hincrby).
         with('channel_subscriber_count', channel.channel_id, -1).
         times(3).returns mock {
           expects(:callback).times(3).yields(2).then.yields(1).then.yields(0)
@@ -47,7 +47,7 @@ describe 'Slanger::Channel' do
 
   describe '#subscribe' do
     it 'increments channel subscribers on Redis' do
-      Slanger::Redis.expects(:hincrby).
+      Slanger::EMRedis.expects(:hincrby).
         with('channel_subscriber_count', channel.channel_id, 1).
         once.returns mock { expects(:callback).once.yields(2) }
       channel.subscribe { |m| nil }
@@ -58,7 +58,7 @@ describe 'Slanger::Channel' do
         with(name: 'channel_occupied', channel: channel.channel_id).
         once
 
-      Slanger::Redis.expects(:hincrby).
+      Slanger::EMRedis.expects(:hincrby).
         with('channel_subscriber_count', channel.channel_id, 1).
         times(3).returns mock {
           expects(:callback).times(3).yields(1).then.yields(2).then.yields(3)

@@ -46,7 +46,7 @@ module Slanger
 
     def initialize(attrs)
       @channel_id = attrs.with_indifferent_access[:channel_id]
-      Slanger::Redis.subscribe channel_id
+      Slanger::EMRedis.subscribe channel_id
     end
 
     def channel
@@ -54,7 +54,7 @@ module Slanger
     end
 
     def subscribe *a, &blk
-      Slanger::Redis.hincrby('channel_subscriber_count', channel_id, 1).
+      Slanger::EMRedis.hincrby('channel_subscriber_count', channel_id, 1).
         callback do |value|
           Slanger::Webhook.post name: 'channel_occupied', channel: channel_id if value == 1
         end
@@ -63,7 +63,7 @@ module Slanger
     end
 
     def unsubscribe *a, &blk
-      Slanger::Redis.hincrby('channel_subscriber_count', channel_id, -1).
+      Slanger::EMRedis.hincrby('channel_subscriber_count', channel_id, -1).
         callback do |value|
           Slanger::Webhook.post name: 'channel_vacated', channel: channel_id if value == 0
         end
@@ -76,7 +76,7 @@ module Slanger
     # Only events to channels requiring authentication (private or presence)
     # are accepted. Public channels only get events from the API.
     def send_client_message(message)
-      Slanger::Redis.publish(message['channel'], Oj.dump(message, mode: :compat)) if authenticated?
+      Slanger::EMRedis.publish(message['channel'], Oj.dump(message, mode: :compat)) if authenticated?
     end
 
     # Send an event received from Redis to the EventMachine channel

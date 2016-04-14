@@ -28,7 +28,7 @@ module Slanger
     def initialize(attrs)
       super
       # Also subscribe the slanger daemon to a Redis channel used for events concerning subscriptions.
-      Slanger::Redis.subscribe 'slanger:connection_notification'
+      Slanger::EMRedis.subscribe 'slanger:connection_notification'
     end
 
     def subscribe(msg, callback, &blk)
@@ -79,7 +79,7 @@ module Slanger
       # Read subscription infos from Redis.
       Fiber.new do
         f = Fiber.current
-        Slanger::Redis.hgetall(channel_id).
+        Slanger::EMRedis.hgetall(channel_id).
           callback { |res| f.resume res }
         Fiber.yield
       end.resume
@@ -87,18 +87,18 @@ module Slanger
 
     def roster_add(key, value)
       # Add subscription info to Redis.
-      Slanger::Redis.hset(channel_id, key, value)
+      Slanger::EMRedis.hset(channel_id, key, value)
     end
 
     def roster_remove(key)
       # Remove subscription info from Redis.
-      Slanger::Redis.hdel(channel_id, key)
+      Slanger::EMRedis.hdel(channel_id, key)
     end
 
     def publish_connection_notification(payload, retry_count=0)
       # Send a subscription notification to the global slanger:connection_notification
       # channel.
-      Slanger::Redis.publish('slanger:connection_notification', Oj.dump(payload, mode: :compat)).
+      Slanger::EMRedis.publish('slanger:connection_notification', Oj.dump(payload, mode: :compat)).
         tap { |r| r.errback { publish_connection_notification payload, retry_count.succ unless retry_count == 5 } }
     end
 

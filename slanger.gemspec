@@ -30,7 +30,8 @@ Gem::Specification.new do |s|
   s.add_dependency                "sinatra",          "~> 1.4.4"
   s.add_dependency                "thin",             "~> 1.6.0"
   s.add_dependency                "em-http-request",  "~> 0.3.0"
-  s.add_dependency		  "oj",		      "~> 2.12.9"
+  s.add_dependency		            "oj",		            "~> 2.12.9"
+  s.add_dependency                "redis",            "~> 3.2"
 
   s.add_development_dependency    "rspec",            "~> 2.12.0"
   s.add_development_dependency    "pusher",           "~> 0.14.2"

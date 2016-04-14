@@ -9,6 +9,7 @@ require 'rack'
 require 'fiber'
 require 'rack/fiber_pool'
 require 'oj'
+require 'redis'
 
 module Slanger
   module Api
@@ -46,15 +47,15 @@ module Slanger
       end
 
       get '/apps/:app_id/channels' do
-        params = valid_request.params
-        keys = Slanger::Redis.keys params["filter_by_prefix"]
+        key_name = valid_request.params['filter_by_prefix'].nil? ? "*" : valid_request.params['filter_by_prefix']+"*"
+        keys = Redis.new(url: Slanger::Config.redis_address).keys key_name
 
         status 200
         return Oj.dump({channels: keys})
       end
 
       get '/apps/:app_id/channels/:channel_id/users' do
-        users = Slanger::Redis.hgetall channel_id
+        users = Redis.new(url: Slanger::Config.redis_address).hgetall channel_id
 
         status 200
         return Oj.dump({users: users})

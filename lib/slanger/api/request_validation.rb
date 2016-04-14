@@ -93,7 +93,7 @@ module Slanger
 
       def authenticate!
         # Raises Signature::AuthenticationError if request does not authenticate.
-        Signature::Request.new('POST', path_info, auth_params).
+        Signature::Request.new(request_method, path_info, auth_params).
           authenticate { |key| Signature::Token.new key, Slanger::Config.secret }
       end
 
