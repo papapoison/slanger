@@ -64,7 +64,7 @@ module Slanger
         @valid_request ||=
           begin
             request_body ||= request.body.read.tap{|s| s.force_encoding("utf-8")}
-            RequestValidation.new(request_body, params, env["PATH_INFO"])
+            RequestValidation.new(request_body, params, env["PATH_INFO"], request.request_method)
           end
       end
     end

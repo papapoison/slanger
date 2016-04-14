@@ -2,7 +2,7 @@ require 'oj'
 
 module Slanger
   module Api
-    class RequestValidation < Struct.new :raw_body, :raw_params, :path_info
+    class RequestValidation < Struct.new :raw_body, :raw_params, :path_info, :request_method
       def initialize(*args)
         super(*args)
 
@@ -42,6 +42,21 @@ module Slanger
       end
 
       def validate!
+        case request_method
+        when "GET"
+          validate_get!
+        when "POST"
+          validate_post!
+        else
+          raise InvalidRequest.new "invalid request method"
+        end
+      end
+
+      def validate_get!
+        raise InvalidRequest.new "invalid path"   unless path_info.is_a? String
+      end
+
+      def validate_post!
         raise InvalidRequest.new "no body"        unless raw_body.present?
         raise InvalidRequest.new "invalid params" unless raw_params.is_a? Hash
         raise InvalidRequest.new "invalid path"   unless path_info.is_a? String
