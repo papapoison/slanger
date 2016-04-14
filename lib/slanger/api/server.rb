@@ -55,7 +55,7 @@ module Slanger
       end
 
       get '/apps/:app_id/channels/:channel_id/users' do
-        users = Redis.new(url: Slanger::Config.redis_address).hgetall channel_id
+        users = Redis.new(url: Slanger::Config.redis_address).hgetall params['channel_id']
 
         status 200
         return Oj.dump({users: users})
